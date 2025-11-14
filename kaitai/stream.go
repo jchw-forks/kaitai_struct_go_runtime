@@ -110,7 +110,8 @@ func (k *Stream) Pos() (int64, error) {
 // ReadU1 reads 1 byte and returns this as uint8.
 func (k *Stream) ReadU1() (v uint8, err error) {
 	k.AlignToByte()
-	if _, err = io.ReadFull(k, k.buf[:1]); err != nil {
+	_, err = io.ReadFull(k, k.buf[:1])
+	if err != nil {
 		return 0, fmt.Errorf("ReadU1: error reading 1 byte: %w", err)
 	}
 	return k.buf[0], nil
@@ -119,7 +120,8 @@ func (k *Stream) ReadU1() (v uint8, err error) {
 // ReadU2be reads 2 bytes in big-endian order and returns those as uint16.
 func (k *Stream) ReadU2be() (v uint16, err error) {
 	k.AlignToByte()
-	if _, err = io.ReadFull(k, k.buf[:2]); err != nil {
+	_, err = io.ReadFull(k, k.buf[:2])
+	if err != nil {
 		return 0, fmt.Errorf("ReadU2be: error reading 2 bytes: %w", err)
 	}
 	return binary.BigEndian.Uint16(k.buf[:2]), nil
@@ -128,7 +130,8 @@ func (k *Stream) ReadU2be() (v uint16, err error) {
 // ReadU4be reads 4 bytes in big-endian order and returns those as uint32.
 func (k *Stream) ReadU4be() (v uint32, err error) {
 	k.AlignToByte()
-	if _, err = io.ReadFull(k, k.buf[:4]); err != nil {
+	_, err = io.ReadFull(k, k.buf[:4])
+	if err != nil {
 		return 0, fmt.Errorf("ReadU4be: error reading 4 bytes: %w", err)
 	}
 	return binary.BigEndian.Uint32(k.buf[:4]), nil
@@ -137,7 +140,8 @@ func (k *Stream) ReadU4be() (v uint32, err error) {
 // ReadU8be reads 8 bytes in big-endian order and returns those as uint64.
 func (k *Stream) ReadU8be() (v uint64, err error) {
 	k.AlignToByte()
-	if _, err = io.ReadFull(k, k.buf[:8]); err != nil {
+	_, err = io.ReadFull(k, k.buf[:8])
+	if err != nil {
 		return 0, fmt.Errorf("ReadU8be: error reading 8 bytes: %w", err)
 	}
 	return binary.BigEndian.Uint64(k.buf[:8]), nil
@@ -146,7 +150,8 @@ func (k *Stream) ReadU8be() (v uint64, err error) {
 // ReadU2le reads 2 bytes in little-endian order and returns those as uint16.
 func (k *Stream) ReadU2le() (v uint16, err error) {
 	k.AlignToByte()
-	if _, err = io.ReadFull(k, k.buf[:2]); err != nil {
+	_, err = io.ReadFull(k, k.buf[:2])
+	if err != nil {
 		return 0, fmt.Errorf("ReadU2le: error reading 2 bytes: %w", err)
 	}
 	return binary.LittleEndian.Uint16(k.buf[:2]), nil
@@ -155,7 +160,8 @@ func (k *Stream) ReadU2le() (v uint16, err error) {
 // ReadU4le reads 4 bytes in little-endian order and returns those as uint32.
 func (k *Stream) ReadU4le() (v uint32, err error) {
 	k.AlignToByte()
-	if _, err = io.ReadFull(k, k.buf[:4]); err != nil {
+	_, err = io.ReadFull(k, k.buf[:4])
+	if err != nil {
 		return 0, fmt.Errorf("ReadU4le: error reading 4 bytes: %w", err)
 	}
 	return binary.LittleEndian.Uint32(k.buf[:4]), nil
@@ -164,7 +170,8 @@ func (k *Stream) ReadU4le() (v uint32, err error) {
 // ReadU8le reads 8 bytes in little-endian order and returns those as uint64.
 func (k *Stream) ReadU8le() (v uint64, err error) {
 	k.AlignToByte()
-	if _, err = io.ReadFull(k, k.buf[:8]); err != nil {
+	_, err = io.ReadFull(k, k.buf[:8])
+	if err != nil {
 		return 0, fmt.Errorf("ReadU8le: error reading 8 bytes: %w", err)
 	}
 	return binary.LittleEndian.Uint64(k.buf[:8]), nil
