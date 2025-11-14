@@ -66,8 +66,8 @@ func (k *Stream) EOF() (bool, error) {
 }
 
 func (k *Stream) Seek(offset int64, whence int) (int64, error) {
-	k.AlignToByte();
-	return k.ReadSeeker.Seek(offset, whence);
+	k.AlignToByte()
+	return k.ReadSeeker.Seek(offset, whence)
 }
 
 // Size returns the number of bytes of the stream.
@@ -108,7 +108,7 @@ func (k *Stream) Pos() (int64, error) {
 
 // ReadU1 reads 1 byte and returns this as uint8.
 func (k *Stream) ReadU1() (v uint8, err error) {
-	k.AlignToByte();
+	k.AlignToByte()
 	if _, err = io.ReadFull(k, k.buf[:1]); err != nil {
 		return 0, fmt.Errorf("ReadU1: error reading 1 byte: %w", err)
 	}
@@ -117,7 +117,7 @@ func (k *Stream) ReadU1() (v uint8, err error) {
 
 // ReadU2be reads 2 bytes in big-endian order and returns those as uint16.
 func (k *Stream) ReadU2be() (v uint16, err error) {
-	k.AlignToByte();
+	k.AlignToByte()
 	if _, err = io.ReadFull(k, k.buf[:2]); err != nil {
 		return 0, fmt.Errorf("ReadU2be: error reading 2 bytes: %w", err)
 	}
@@ -126,7 +126,7 @@ func (k *Stream) ReadU2be() (v uint16, err error) {
 
 // ReadU4be reads 4 bytes in big-endian order and returns those as uint32.
 func (k *Stream) ReadU4be() (v uint32, err error) {
-	k.AlignToByte();
+	k.AlignToByte()
 	if _, err = io.ReadFull(k, k.buf[:4]); err != nil {
 		return 0, fmt.Errorf("ReadU4be: error reading 4 bytes: %w", err)
 	}
@@ -135,7 +135,7 @@ func (k *Stream) ReadU4be() (v uint32, err error) {
 
 // ReadU8be reads 8 bytes in big-endian order and returns those as uint64.
 func (k *Stream) ReadU8be() (v uint64, err error) {
-	k.AlignToByte();
+	k.AlignToByte()
 	if _, err = io.ReadFull(k, k.buf[:8]); err != nil {
 		return 0, fmt.Errorf("ReadU8be: error reading 8 bytes: %w", err)
 	}
@@ -144,7 +144,7 @@ func (k *Stream) ReadU8be() (v uint64, err error) {
 
 // ReadU2le reads 2 bytes in little-endian order and returns those as uint16.
 func (k *Stream) ReadU2le() (v uint16, err error) {
-	k.AlignToByte();
+	k.AlignToByte()
 	if _, err = io.ReadFull(k, k.buf[:2]); err != nil {
 		return 0, fmt.Errorf("ReadU2le: error reading 2 bytes: %w", err)
 	}
@@ -153,7 +153,7 @@ func (k *Stream) ReadU2le() (v uint16, err error) {
 
 // ReadU4le reads 4 bytes in little-endian order and returns those as uint32.
 func (k *Stream) ReadU4le() (v uint32, err error) {
-	k.AlignToByte();
+	k.AlignToByte()
 	if _, err = io.ReadFull(k, k.buf[:4]); err != nil {
 		return 0, fmt.Errorf("ReadU4le: error reading 4 bytes: %w", err)
 	}
@@ -162,7 +162,7 @@ func (k *Stream) ReadU4le() (v uint32, err error) {
 
 // ReadU8le reads 8 bytes in little-endian order and returns those as uint64.
 func (k *Stream) ReadU8le() (v uint64, err error) {
-	k.AlignToByte();
+	k.AlignToByte()
 	if _, err = io.ReadFull(k, k.buf[:8]); err != nil {
 		return 0, fmt.Errorf("ReadU8le: error reading 8 bytes: %w", err)
 	}
@@ -171,84 +171,84 @@ func (k *Stream) ReadU8le() (v uint64, err error) {
 
 // ReadS1 reads 1 byte and returns this as int8.
 func (k *Stream) ReadS1() (v int8, err error) {
-	k.AlignToByte();
+	k.AlignToByte()
 	vv, err := k.ReadU1()
 	return int8(vv), err
 }
 
 // ReadS2be reads 2 bytes in big-endian order and returns those as int16.
 func (k *Stream) ReadS2be() (v int16, err error) {
-	k.AlignToByte();
+	k.AlignToByte()
 	vv, err := k.ReadU2be()
 	return int16(vv), err
 }
 
 // ReadS4be reads 4 bytes in big-endian order and returns those as int32.
 func (k *Stream) ReadS4be() (v int32, err error) {
-	k.AlignToByte();
+	k.AlignToByte()
 	vv, err := k.ReadU4be()
 	return int32(vv), err
 }
 
 // ReadS8be reads 8 bytes in big-endian order and returns those as int64.
 func (k *Stream) ReadS8be() (v int64, err error) {
-	k.AlignToByte();
+	k.AlignToByte()
 	vv, err := k.ReadU8be()
 	return int64(vv), err
 }
 
 // ReadS2le reads 2 bytes in little-endian order and returns those as int16.
 func (k *Stream) ReadS2le() (v int16, err error) {
-	k.AlignToByte();
+	k.AlignToByte()
 	vv, err := k.ReadU2le()
 	return int16(vv), err
 }
 
 // ReadS4le reads 4 bytes in little-endian order and returns those as int32.
 func (k *Stream) ReadS4le() (v int32, err error) {
-	k.AlignToByte();
+	k.AlignToByte()
 	vv, err := k.ReadU4le()
 	return int32(vv), err
 }
 
 // ReadS8le reads 8 bytes in little-endian order and returns those as int64.
 func (k *Stream) ReadS8le() (v int64, err error) {
-	k.AlignToByte();
+	k.AlignToByte()
 	vv, err := k.ReadU8le()
 	return int64(vv), err
 }
 
 // ReadF4be reads 4 bytes in big-endian order and returns those as float32.
 func (k *Stream) ReadF4be() (v float32, err error) {
-	k.AlignToByte();
+	k.AlignToByte()
 	vv, err := k.ReadU4be()
 	return math.Float32frombits(vv), err
 }
 
 // ReadF8be reads 8 bytes in big-endian order and returns those as float64.
 func (k *Stream) ReadF8be() (v float64, err error) {
-	k.AlignToByte();
+	k.AlignToByte()
 	vv, err := k.ReadU8be()
 	return math.Float64frombits(vv), err
 }
 
 // ReadF4le reads 4 bytes in little-endian order and returns those as float32.
 func (k *Stream) ReadF4le() (v float32, err error) {
-	k.AlignToByte();
+	k.AlignToByte()
 	vv, err := k.ReadU4le()
 	return math.Float32frombits(vv), err
 }
 
 // ReadF8le reads 8 bytes in little-endian order and returns those as float64.
 func (k *Stream) ReadF8le() (v float64, err error) {
-	k.AlignToByte();
+	k.AlignToByte()
 	vv, err := k.ReadU8le()
 	return math.Float64frombits(vv), err
 }
 
 // ReadBytes reads n bytes and returns those as a byte array.
 func (k *Stream) ReadBytes(n int) (b []byte, err error) {
-	k.AlignToByte();
+	k.AlignToByte()
 	if n < 0 {
 		return nil, fmt.Errorf("ReadBytes(%d): %w", n, ErrInvalidSizeRequested)
 	}
@@ -263,7 +263,7 @@ func (k *Stream) ReadBytes(n int) (b []byte, err error) {
 
 // ReadBytesFull reads all remaining bytes and returns those as a byte array.
 func (k *Stream) ReadBytesFull() ([]byte, error) {
-	k.AlignToByte();
+	k.AlignToByte()
 	res, err := io.ReadAll(k)
 	if err != nil {
 		return nil, fmt.Errorf("ReadBytesFull: error reading all bytes: %w", err)
@@ -299,7 +299,7 @@ func (k *Stream) ReadBytesPadTerm(size int, term, pad byte, includeTerm bool) ([
 // true, the stream continues after the term byte. If eosError is true, EOF
 // errors result in an error.
 func (k *Stream) ReadBytesTerm(term byte, includeTerm, consumeTerm, eosError bool) ([]byte, error) {
-	k.AlignToByte();
+	k.AlignToByte()
 	r := bufio.NewReader(k)
 	pos, err := k.Pos()
 	if err != nil {
@@ -338,7 +338,7 @@ func (k *Stream) ReadBytesTerm(term byte, includeTerm, consumeTerm, eosError boo
 // treated as an error, otherwise no error and all bytes until EOF are returned
 // in this case.
 func (k *Stream) ReadBytesTermMulti(term []byte, includeTerm, consumeTerm, eosError bool) ([]byte, error) {
-	k.AlignToByte();
+	k.AlignToByte()
 	unitSize := len(term)
 	r := []byte{}
 	c := make([]byte, unitSize)
