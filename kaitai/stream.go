@@ -25,6 +25,7 @@ var ErrInvalidSizeRequested = errors.New("invalid size requested")
 // reading/writing of various primitives.
 type Stream struct {
 	io.ReadSeeker
+
 	buf [8]byte
 
 	// Number of bits remaining in "bits" for sequential calls to ReadBitsInt

@@ -10,6 +10,7 @@ import (
 // A Writer encapsulates writing binary data to files and memory.
 type Writer struct {
 	io.Writer
+
 	buf [8]byte
 }
 

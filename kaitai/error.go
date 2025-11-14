@@ -56,18 +56,19 @@ func validationFailedMsg(msg string) string {
 // ValidationNotEqualError signals validation failure: we required "Actual" value
 // to be equal to "Expected", but it turned out that it's not.
 type ValidationNotEqualError struct {
+	locationInfo
+
 	expected interface{}
 	actual   interface{}
-	locationInfo
 }
 
 // NewValidationNotEqualError creates a new ValidationNotEqualError instance.
 func NewValidationNotEqualError(
 	expected interface{}, actual interface{}, io *Stream, srcPath string) ValidationNotEqualError {
 	return ValidationNotEqualError{
+		newLocationInfo(io, srcPath),
 		expected,
 		actual,
-		newLocationInfo(io, srcPath),
 	}
 }
 
@@ -88,18 +89,19 @@ func (e ValidationNotEqualError) Error() string {
 // ValidationLessThanError signals validation failure: we required "Actual" value
 // to be greater than or equal to "Min", but it turned out that it's not.
 type ValidationLessThanError struct {
+	locationInfo
+
 	min    interface{}
 	actual interface{}
-	locationInfo
 }
 
 // NewValidationLessThanError creates a new ValidationLessThanError instance.
 func NewValidationLessThanError(
 	min interface{}, actual interface{}, io *Stream, srcPath string) ValidationLessThanError {
 	return ValidationLessThanError{
+		newLocationInfo(io, srcPath),
 		min,
 		actual,
-		newLocationInfo(io, srcPath),
 	}
 }
 
@@ -120,18 +122,19 @@ func (e ValidationLessThanError) Error() string {
 // ValidationGreaterThanError signals validation failure: we required "Actual" value
 // to be less than or equal to "Max", but it turned out that it's not.
 type ValidationGreaterThanError struct {
+	locationInfo
+
 	max    interface{}
 	actual interface{}
-	locationInfo
 }
 
 // NewValidationGreaterThanError creates a new ValidationGreaterThanError instance.
 func NewValidationGreaterThanError(
 	max interface{}, actual interface{}, io *Stream, srcPath string) ValidationGreaterThanError {
 	return ValidationGreaterThanError{
+		newLocationInfo(io, srcPath),
 		max,
 		actual,
-		newLocationInfo(io, srcPath),
 	}
 }
 
@@ -152,15 +155,16 @@ func (e ValidationGreaterThanError) Error() string {
 // ValidationNotAnyOfError signals validation failure: we required "Actual" value
 // to be from the list, but it turned out that it's not.
 type ValidationNotAnyOfError struct {
-	actual interface{}
 	locationInfo
+
+	actual interface{}
 }
 
 // NewValidationNotAnyOfError creates a new ValidationNotAnyOfError instance.
 func NewValidationNotAnyOfError(actual interface{}, io *Stream, srcPath string) ValidationNotAnyOfError {
 	return ValidationNotAnyOfError{
-		actual,
 		newLocationInfo(io, srcPath),
+		actual,
 	}
 }
 
@@ -178,15 +182,16 @@ func (e ValidationNotAnyOfError) Error() string {
 // ValidationNotInEnumError signals validation failure: we required "Actual" value
 // to be in the enum, but it turned out that it's not.
 type ValidationNotInEnumError struct {
-	actual interface{}
 	locationInfo
+
+	actual interface{}
 }
 
 // NewValidationNotInEnumError creates a new ValidationNotInEnumError instance.
 func NewValidationNotInEnumError(actual interface{}, io *Stream, srcPath string) ValidationNotInEnumError {
 	return ValidationNotInEnumError{
-		actual,
 		newLocationInfo(io, srcPath),
+		actual,
 	}
 }
 
@@ -204,15 +209,16 @@ func (e ValidationNotInEnumError) Error() string {
 // ValidationExprError signals validation failure: we required "Actual" value
 // to match the expression, but it turned out that it doesn't.
 type ValidationExprError struct {
-	actual interface{}
 	locationInfo
+
+	actual interface{}
 }
 
 // NewValidationExprError creates a new ValidationExprError instance.
 func NewValidationExprError(actual interface{}, io *Stream, srcPath string) ValidationExprError {
 	return ValidationExprError{
-		actual,
 		newLocationInfo(io, srcPath),
+		actual,
 	}
 }
 
