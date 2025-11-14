@@ -75,7 +75,7 @@ func TestValidationFailedError_interface(t *testing.T) {
 	srcPath := "types/header/seq/7"
 	tests := []struct {
 		name string
-		e    interface{}
+		e    any
 	}{
 		{"ValidationNotEqualError", NewValidationNotEqualError(2, actual, io, srcPath)},
 		{"ValidationLessThanError", NewValidationLessThanError(2, actual, io, srcPath)},
@@ -137,7 +137,7 @@ func TestValidationNotEqualError_Expected(t *testing.T) {
 	tests := []struct {
 		name string
 		e    ValidationNotEqualError
-		want interface{}
+		want any
 	}{
 		{"Expected", NewValidationNotEqualError(42, -1, io, "/seq/0"), 42},
 	}
@@ -183,7 +183,7 @@ func TestValidationLessThanError_Min(t *testing.T) {
 	tests := []struct {
 		name string
 		e    ValidationLessThanError
-		want interface{}
+		want any
 	}{
 		{"Min", NewValidationLessThanError(42, -1, io, "/seq/0"), 42},
 	}
@@ -229,7 +229,7 @@ func TestValidationGreaterThanError_Max(t *testing.T) {
 	tests := []struct {
 		name string
 		e    ValidationGreaterThanError
-		want interface{}
+		want any
 	}{
 		{"Max", NewValidationGreaterThanError(42, 45, io, "/seq/0"), 42},
 	}

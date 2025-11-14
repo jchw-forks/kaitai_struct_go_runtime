@@ -29,8 +29,8 @@ func (s *twoStruct) IO_() *Stream {
 func WorkWithStruct(t *testing.T, s Struct, expectedSize int) {
 	t.Helper()
 	actualSize, err := s.IO_().Size()
-	assert.Nil(t, err)
-	assert.Equal(t, actualSize, int64(expectedSize))
+	assert.NoError(t, err)
+	assert.Equal(t, int64(expectedSize), actualSize)
 }
 
 func TestKaitaiStruct(t *testing.T) {

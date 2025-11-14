@@ -348,7 +348,7 @@ func (k *Stream) ReadBytesTermMulti(term []byte, includeTerm, consumeTerm, eosEr
 		if err != nil {
 			if errors.Is(err, io.EOF) || errors.Is(err, io.ErrUnexpectedEOF) {
 				if eosError {
-					return nil, fmt.Errorf("ReadBytesTermMulti: end of stream reached, but no terminator found")
+					return nil, errors.New("ReadBytesTermMulti: end of stream reached, but no terminator found")
 				}
 				r = append(r, c[:n]...)
 				return r, nil
@@ -397,7 +397,7 @@ func (k *Stream) ReadBitsIntBe(n int) (res uint64, err error) {
 		if err != nil {
 			return res, fmt.Errorf("ReadBitsIntBe(%d): %w", n, err)
 		}
-		for i := 0; i < bytesNeeded; i++ {
+		for i := range bytesNeeded {
 			res = res<<8 | uint64(k.buf[i])
 		}
 
@@ -438,7 +438,7 @@ func (k *Stream) ReadBitsIntLe(n int) (res uint64, err error) {
 		if err != nil {
 			return res, fmt.Errorf("ReadBitsIntLe(%d): %w", n, err)
 		}
-		for i := 0; i < bytesNeeded; i++ {
+		for i := range bytesNeeded {
 			res |= uint64(k.buf[i]) << (i * 8)
 		}
 

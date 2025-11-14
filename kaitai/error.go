@@ -34,7 +34,7 @@ func (l locationInfo) Io() *Stream { return l.io }
 func (l locationInfo) SrcPath() string { return l.srcPath }
 
 func (l locationInfo) msgWithLocation(msg string) string {
-	var pos interface{}
+	var pos any
 	pos, err := l.io.Pos()
 	if err != nil {
 		pos = "N/A"
@@ -44,7 +44,7 @@ func (l locationInfo) msgWithLocation(msg string) string {
 
 // ValidationFailedError is an interface that all "Validation*Error"s implement.
 type ValidationFailedError interface {
-	Actual() interface{}
+	Actual() any
 	Io() *Stream
 	SrcPath() string
 }
@@ -58,13 +58,13 @@ func validationFailedMsg(msg string) string {
 type ValidationNotEqualError struct {
 	locationInfo
 
-	expected interface{}
-	actual   interface{}
+	expected any
+	actual   any
 }
 
 // NewValidationNotEqualError creates a new ValidationNotEqualError instance.
 func NewValidationNotEqualError(
-	expected interface{}, actual interface{}, io *Stream, srcPath string) ValidationNotEqualError {
+	expected any, actual any, io *Stream, srcPath string) ValidationNotEqualError {
 	return ValidationNotEqualError{
 		newLocationInfo(io, srcPath),
 		expected,
@@ -73,10 +73,10 @@ func NewValidationNotEqualError(
 }
 
 // Expected is a getter of the expected value associated with the validation error.
-func (e ValidationNotEqualError) Expected() interface{} { return e.expected }
+func (e ValidationNotEqualError) Expected() any { return e.expected }
 
 // Actual is a getter of the actual value associated with the validation error.
-func (e ValidationNotEqualError) Actual() interface{} { return e.actual }
+func (e ValidationNotEqualError) Actual() any { return e.actual }
 
 func (e ValidationNotEqualError) Error() string {
 	return e.msgWithLocation(
@@ -91,13 +91,13 @@ func (e ValidationNotEqualError) Error() string {
 type ValidationLessThanError struct {
 	locationInfo
 
-	min    interface{}
-	actual interface{}
+	min    any
+	actual any
 }
 
 // NewValidationLessThanError creates a new ValidationLessThanError instance.
 func NewValidationLessThanError(
-	min interface{}, actual interface{}, io *Stream, srcPath string) ValidationLessThanError {
+	min any, actual any, io *Stream, srcPath string) ValidationLessThanError {
 	return ValidationLessThanError{
 		newLocationInfo(io, srcPath),
 		min,
@@ -106,10 +106,10 @@ func NewValidationLessThanError(
 }
 
 // Min is a getter of the minimum value associated with the validation error.
-func (e ValidationLessThanError) Min() interface{} { return e.min }
+func (e ValidationLessThanError) Min() any { return e.min }
 
 // Actual is a getter of the actual value associated with the validation error.
-func (e ValidationLessThanError) Actual() interface{} { return e.actual }
+func (e ValidationLessThanError) Actual() any { return e.actual }
 
 func (e ValidationLessThanError) Error() string {
 	return e.msgWithLocation(
@@ -124,13 +124,13 @@ func (e ValidationLessThanError) Error() string {
 type ValidationGreaterThanError struct {
 	locationInfo
 
-	max    interface{}
-	actual interface{}
+	max    any
+	actual any
 }
 
 // NewValidationGreaterThanError creates a new ValidationGreaterThanError instance.
 func NewValidationGreaterThanError(
-	max interface{}, actual interface{}, io *Stream, srcPath string) ValidationGreaterThanError {
+	max any, actual any, io *Stream, srcPath string) ValidationGreaterThanError {
 	return ValidationGreaterThanError{
 		newLocationInfo(io, srcPath),
 		max,
@@ -139,10 +139,10 @@ func NewValidationGreaterThanError(
 }
 
 // Max is a getter of the maximum value associated with the validation error.
-func (e ValidationGreaterThanError) Max() interface{} { return e.max }
+func (e ValidationGreaterThanError) Max() any { return e.max }
 
 // Actual is a getter of the actual value associated with the validation error.
-func (e ValidationGreaterThanError) Actual() interface{} { return e.actual }
+func (e ValidationGreaterThanError) Actual() any { return e.actual }
 
 func (e ValidationGreaterThanError) Error() string {
 	return e.msgWithLocation(
@@ -157,11 +157,11 @@ func (e ValidationGreaterThanError) Error() string {
 type ValidationNotAnyOfError struct {
 	locationInfo
 
-	actual interface{}
+	actual any
 }
 
 // NewValidationNotAnyOfError creates a new ValidationNotAnyOfError instance.
-func NewValidationNotAnyOfError(actual interface{}, io *Stream, srcPath string) ValidationNotAnyOfError {
+func NewValidationNotAnyOfError(actual any, io *Stream, srcPath string) ValidationNotAnyOfError {
 	return ValidationNotAnyOfError{
 		newLocationInfo(io, srcPath),
 		actual,
@@ -169,7 +169,7 @@ func NewValidationNotAnyOfError(actual interface{}, io *Stream, srcPath string) 
 }
 
 // Actual is a getter of the actual value associated with the validation error.
-func (e ValidationNotAnyOfError) Actual() interface{} { return e.actual }
+func (e ValidationNotAnyOfError) Actual() any { return e.actual }
 
 func (e ValidationNotAnyOfError) Error() string {
 	return e.msgWithLocation(
@@ -184,11 +184,11 @@ func (e ValidationNotAnyOfError) Error() string {
 type ValidationNotInEnumError struct {
 	locationInfo
 
-	actual interface{}
+	actual any
 }
 
 // NewValidationNotInEnumError creates a new ValidationNotInEnumError instance.
-func NewValidationNotInEnumError(actual interface{}, io *Stream, srcPath string) ValidationNotInEnumError {
+func NewValidationNotInEnumError(actual any, io *Stream, srcPath string) ValidationNotInEnumError {
 	return ValidationNotInEnumError{
 		newLocationInfo(io, srcPath),
 		actual,
@@ -196,7 +196,7 @@ func NewValidationNotInEnumError(actual interface{}, io *Stream, srcPath string)
 }
 
 // Actual is a getter of the actual value associated with the validation error.
-func (e ValidationNotInEnumError) Actual() interface{} { return e.actual }
+func (e ValidationNotInEnumError) Actual() any { return e.actual }
 
 func (e ValidationNotInEnumError) Error() string {
 	return e.msgWithLocation(
@@ -211,11 +211,11 @@ func (e ValidationNotInEnumError) Error() string {
 type ValidationExprError struct {
 	locationInfo
 
-	actual interface{}
+	actual any
 }
 
 // NewValidationExprError creates a new ValidationExprError instance.
-func NewValidationExprError(actual interface{}, io *Stream, srcPath string) ValidationExprError {
+func NewValidationExprError(actual any, io *Stream, srcPath string) ValidationExprError {
 	return ValidationExprError{
 		newLocationInfo(io, srcPath),
 		actual,
@@ -223,7 +223,7 @@ func NewValidationExprError(actual interface{}, io *Stream, srcPath string) Vali
 }
 
 // Actual is a getter of the actual value associated with the validation error.
-func (e ValidationExprError) Actual() interface{} { return e.actual }
+func (e ValidationExprError) Actual() any { return e.actual }
 
 func (e ValidationExprError) Error() string {
 	return e.msgWithLocation(
