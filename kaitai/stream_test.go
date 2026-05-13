@@ -598,6 +598,11 @@ func TestStream_ReadBytesPadTerm(t *testing.T) {
 		{"ReadBytesPadTerm", NewStream(bytes.NewReader([]byte("fooo"))), args{3, 'o', 'x', true}, []byte("fo"), false},
 		{"ReadBytesPadTerm", NewStream(bytes.NewReader([]byte("fooo"))), args{3, 'x', 'o', true}, []byte("f"), false},
 		{"ReadBytesPadTerm", NewStream(bytes.NewReader([]byte("fooo"))), args{-3, 'x', 'o', true}, nil, true},
+		// pad == term: terminator should be found before padding is stripped
+		{"pad equals term", NewStream(bytes.NewReader([]byte{0x41, 0x42, 0x00, 0x00, 0x00})), args{5, 0x00, 0x00, false}, []byte{0x41, 0x42}, false},
+		{"pad equals term include", NewStream(bytes.NewReader([]byte{0x41, 0x42, 0x00, 0x00, 0x00})), args{5, 0x00, 0x00, true}, []byte{0x41, 0x42, 0x00}, false},
+		// Non-ASCII pad byte (>= 0x80): must strip correctly without UTF-8 misinterpretation
+		{"non-ASCII pad", NewStream(bytes.NewReader([]byte{0x41, 0x42, 0xAA, 0xAA})), args{4, 0xFF, 0xAA, false}, []byte{0x41, 0x42}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -288,8 +288,9 @@ func (k *Stream) ReadBytesPadTerm(size int, term, pad byte, includeTerm bool) ([
 		return nil, err
 	}
 
-	bs = bytes.TrimRight(bs, string(pad))
-
+	// Find the terminator first, then strip padding from the relevant portion.
+	// This order matters when pad == term: stripping first would remove the
+	// terminator before we can find it.
 	i := bytes.IndexByte(bs, term)
 	if i != -1 {
 		if includeTerm {
@@ -297,6 +298,8 @@ func (k *Stream) ReadBytesPadTerm(size int, term, pad byte, includeTerm bool) ([
 		} else {
 			bs = bs[:i]
 		}
+	} else {
+		bs = BytesStripRight(bs, pad)
 	}
 
 	return bs, nil
