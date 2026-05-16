@@ -1,4 +1,4 @@
-module github.com/kaitai-io/kaitai_struct_go_runtime
+module github.com/jchw-forks/kaitai_struct_go_runtime
 
 go 1.24.0
 
