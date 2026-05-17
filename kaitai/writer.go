@@ -270,7 +270,7 @@ func (k *Writer) WriteBytesLimit(data []byte, size int, term int, padRight int) 
 func (k *Writer) WriteBitsIntBe(n int, val uint64) error {
 	k.bitsLe = false
 
-	mask := uint64((1 << uint(n)) - 1)
+	mask := uint64((1 << n) - 1)
 	val &= mask
 
 	bitsToWrite := k.bitsLeft + n
@@ -281,9 +281,9 @@ func (k *Writer) WriteBitsIntBe(n int, val uint64) error {
 	if bytesToWrite > 0 {
 		buf := make([]byte, bytesToWrite)
 
-		mask := uint64((1 << uint(k.bitsLeft)) - 1) // `bitsLeft` is in range 0..7
+		mask := uint64((1 << k.bitsLeft) - 1) // `bitsLeft` is in range 0..7
 		newBits := val & mask
-		val = val>>uint(k.bitsLeft) | k.bits<<uint(n-k.bitsLeft)
+		val = val>>k.bitsLeft | k.bits<<(n-k.bitsLeft)
 		k.bits = newBits
 
 		for i := bytesToWrite - 1; i >= 0; i-- {
@@ -295,7 +295,7 @@ func (k *Writer) WriteBitsIntBe(n int, val uint64) error {
 			return fmt.Errorf("WriteBitsIntBe: %w", err)
 		}
 	} else {
-		k.bits = k.bits<<uint(n) | val
+		k.bits = k.bits<<n | val
 	}
 
 	return nil
@@ -314,8 +314,8 @@ func (k *Writer) WriteBitsIntLe(n int, val uint64) error {
 	if bytesToWrite > 0 {
 		buf := make([]byte, bytesToWrite)
 
-		newBits := val >> uint(n-k.bitsLeft)
-		val = val<<uint(oldBitsLeft) | k.bits
+		newBits := val >> (n - k.bitsLeft)
+		val = val<<oldBitsLeft | k.bits
 		k.bits = newBits
 
 		for i := range bytesToWrite {
@@ -327,10 +327,10 @@ func (k *Writer) WriteBitsIntLe(n int, val uint64) error {
 			return fmt.Errorf("WriteBitsIntLe: %w", err)
 		}
 	} else {
-		k.bits |= val << uint(oldBitsLeft)
+		k.bits |= val << oldBitsLeft
 	}
 
-	var mask uint64 = (1 << uint(k.bitsLeft)) - 1 // `bitsLeft` is in range 0..7
+	var mask uint64 = (1 << k.bitsLeft) - 1 // `bitsLeft` is in range 0..7
 	k.bits &= mask
 
 	return nil
@@ -341,7 +341,7 @@ func (k *Writer) AlignToByte() error {
 	if k.bitsLeft > 0 {
 		b := k.bits
 		if !k.bitsLe {
-			b <<= uint(8 - k.bitsLeft)
+			b <<= 8 - k.bitsLeft
 		}
 		k.bitsLeft = 0
 		k.bits = 0
