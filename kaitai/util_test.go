@@ -101,7 +101,7 @@ func TestProcessZlib(t *testing.T) {
 	}
 }
 
-func TestProcessZlibCompress(t *testing.T) {
+func TestUnprocessZlib(t *testing.T) {
 	tests := []struct {
 		name string
 		in   []byte
@@ -112,9 +112,9 @@ func TestProcessZlibCompress(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			compressed, err := ProcessZlibCompress(tt.in)
+			compressed, err := UnprocessZlib(tt.in)
 			if err != nil {
-				t.Fatalf("ProcessZlibCompress() error = %v", err)
+				t.Fatalf("UnprocessZlib() error = %v", err)
 			}
 			// Round-trip through ProcessZlib to verify validity.
 			got, err := ProcessZlib(compressed)

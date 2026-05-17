@@ -54,17 +54,17 @@ func ProcessZlib(in []byte) ([]byte, error) {
 	return res, nil
 }
 
-// ProcessZlibCompress compresses data using zlib.
-func ProcessZlibCompress(in []byte) ([]byte, error) {
+// UnprocessZlib compresses data using zlib.
+func UnprocessZlib(in []byte) ([]byte, error) {
 	var buf bytes.Buffer
 	w := zlib.NewWriter(&buf)
 	_, err := w.Write(in)
 	if err != nil {
-		return nil, fmt.Errorf("ProcessZlibCompress: error writing zlib data: %w", err)
+		return nil, fmt.Errorf("UnprocessZlib: error writing zlib data: %w", err)
 	}
 	err = w.Close()
 	if err != nil {
-		return nil, fmt.Errorf("ProcessZlibCompress: error flushing zlib stream: %w", err)
+		return nil, fmt.Errorf("UnprocessZlib: error flushing zlib stream: %w", err)
 	}
 	return buf.Bytes(), nil
 }
