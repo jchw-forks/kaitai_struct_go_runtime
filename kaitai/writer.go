@@ -16,6 +16,7 @@ type Writer struct {
 
 	bits     uint64
 	bitsLeft int
+	bitsLe   bool
 }
 
 // NewWriter creates and initializes a new Writer using w.
@@ -38,11 +39,8 @@ func (k *Writer) Pos() (int64, error) {
 }
 
 // Seek seeks to the given position, if the stream is seekable.
-//
-// Seek does not flush bits buffered by WriteBitsIntBe/Le. Call AlignToByte
-// or AlignToByteLe first if a bit-level write is pending; otherwise the
-// buffered bits could be emitted at the new position.
 func (k *Writer) Seek(offset int64, whence int) (int64, error) {
+	k.AlignToByte()
 	switch w := k.Writer.(type) {
 	case io.Seeker:
 		n, err := w.Seek(offset, whence)
@@ -57,6 +55,7 @@ func (k *Writer) Seek(offset int64, whence int) (int64, error) {
 
 // WriteU1 writes a uint8 to the underlying writer.
 func (k *Writer) WriteU1(v uint8) error {
+	k.AlignToByte()
 	k.buf[0] = v
 	_, err := k.Write(k.buf[:1])
 	if err != nil {
@@ -67,6 +66,7 @@ func (k *Writer) WriteU1(v uint8) error {
 
 // WriteU2be writes a uint16 in big-endian order to the underlying writer.
 func (k *Writer) WriteU2be(v uint16) error {
+	k.AlignToByte()
 	binary.BigEndian.PutUint16(k.buf[:2], v)
 	_, err := k.Write(k.buf[:2])
 	if err != nil {
@@ -77,6 +77,7 @@ func (k *Writer) WriteU2be(v uint16) error {
 
 // WriteU4be writes a uint32 in big-endian order to the underlying writer.
 func (k *Writer) WriteU4be(v uint32) error {
+	k.AlignToByte()
 	binary.BigEndian.PutUint32(k.buf[:4], v)
 	_, err := k.Write(k.buf[:4])
 	if err != nil {
@@ -87,6 +88,7 @@ func (k *Writer) WriteU4be(v uint32) error {
 
 // WriteU8be writes a uint64 in big-endian order to the underlying writer.
 func (k *Writer) WriteU8be(v uint64) error {
+	k.AlignToByte()
 	binary.BigEndian.PutUint64(k.buf[:8], v)
 	_, err := k.Write(k.buf[:8])
 	if err != nil {
@@ -97,6 +99,7 @@ func (k *Writer) WriteU8be(v uint64) error {
 
 // WriteU2le writes a uint16 in little-endian order to the underlying writer.
 func (k *Writer) WriteU2le(v uint16) error {
+	k.AlignToByte()
 	binary.LittleEndian.PutUint16(k.buf[:2], v)
 	_, err := k.Write(k.buf[:2])
 	if err != nil {
@@ -107,6 +110,7 @@ func (k *Writer) WriteU2le(v uint16) error {
 
 // WriteU4le writes a uint32 in little-endian order to the underlying writer.
 func (k *Writer) WriteU4le(v uint32) error {
+	k.AlignToByte()
 	binary.LittleEndian.PutUint32(k.buf[:4], v)
 	_, err := k.Write(k.buf[:4])
 	if err != nil {
@@ -117,6 +121,7 @@ func (k *Writer) WriteU4le(v uint32) error {
 
 // WriteU8le writes a uint64 in little-endian order to the underlying writer.
 func (k *Writer) WriteU8le(v uint64) error {
+	k.AlignToByte()
 	binary.LittleEndian.PutUint64(k.buf[:8], v)
 	_, err := k.Write(k.buf[:8])
 	if err != nil {
@@ -182,6 +187,7 @@ func (k *Writer) WriteF8le(v float64) error {
 
 // WriteBytes writes the byte slice b to the underlying writer.
 func (k *Writer) WriteBytes(b []byte) error {
+	k.AlignToByte()
 	_, err := k.Write(b)
 	if err != nil {
 		return fmt.Errorf("WriteBytes: failed to write bytes: %w", err)
@@ -196,7 +202,7 @@ func (k *Writer) WriteBytesLimit(data []byte, size int, term int, padRight int) 
 	if len(data) > size {
 		data = data[:size]
 	}
-	_, err := k.Write(data)
+	err := k.WriteBytes(data)
 	if err != nil {
 		return fmt.Errorf("WriteBytesLimit: failed to write bytes: %w", err)
 	}
@@ -225,7 +231,7 @@ func (k *Writer) WriteBytesLimit(data []byte, size int, term int, padRight int) 
 		for i := range padding {
 			padding[i] = pad
 		}
-		_, err := k.Write(padding)
+		err := k.WriteBytes(padding)
 		if err != nil {
 			return fmt.Errorf("WriteBytesLimit: failed to write padding: %w", err)
 		}
@@ -235,107 +241,88 @@ func (k *Writer) WriteBytesLimit(data []byte, size int, term int, padRight int) 
 
 // WriteBitsIntBe writes n bits in big-endian bit order.
 func (k *Writer) WriteBitsIntBe(n int, val uint64) error {
-	if n < 64 {
-		val &= (1 << uint(n)) - 1
-	}
-	// Handle overflow: when bitsLeft + n > 64, we can't shift into w.bits.
-	// Flush existing bits first, then handle val directly.
-	if k.bitsLeft > 0 && k.bitsLeft+n > 64 {
-		// Flush existing bits by combining with the high bits of val
-		bitsNeeded := 8 - k.bitsLeft
-		if bitsNeeded <= n {
-			// Take bitsNeeded from the top of val
-			highBits := val >> uint(n-bitsNeeded)
-			b := byte((k.bits << uint(bitsNeeded)) | highBits)
-			err := k.WriteU1(b)
-			if err != nil {
-				return err
-			}
-			n -= bitsNeeded
-			if n < 64 {
-				val &= (1 << uint(n)) - 1
-			}
-			k.bits = 0
-			k.bitsLeft = 0
+	k.bitsLe = false
+
+	mask := uint64((1 << uint(n)) - 1)
+	val &= mask
+
+	bitsToWrite := k.bitsLeft + n
+
+	bytesToWrite := bitsToWrite / 8
+	k.bitsLeft = bitsToWrite % 8
+
+	if bytesToWrite > 0 {
+		buf := make([]byte, bytesToWrite)
+
+		mask := uint64((1 << uint(k.bitsLeft)) - 1) // `bitsLeft` is in range 0..7
+		newBits := val & mask
+		val = val>>uint(k.bitsLeft) | k.bits<<uint(n-k.bitsLeft)
+		k.bits = newBits
+
+		for i := bytesToWrite - 1; i >= 0; i-- {
+			buf[i] = byte(val & 0xFF)
+			val >>= 8
 		}
-	}
-	// Now bitsLeft + n <= 64, safe to accumulate.
-	k.bits = (k.bits << uint(n)) | val
-	k.bitsLeft += n
-	for k.bitsLeft >= 8 {
-		k.bitsLeft -= 8
-		b := byte(k.bits >> uint(k.bitsLeft))
-		err := k.WriteU1(b)
+		_, err := k.Write(buf)
 		if err != nil {
-			return fmt.Errorf("WriteBitsIntBe: failed to write full byte: %w", err)
+			return fmt.Errorf("WriteBitsIntBe: %w", err)
 		}
-	}
-	if k.bitsLeft > 0 {
-		k.bits &= (1 << uint(k.bitsLeft)) - 1
 	} else {
-		k.bits = 0
+		k.bits = k.bits<<uint(n) | val
 	}
+
 	return nil
 }
 
 // WriteBitsIntLe writes n bits in little-endian bit order.
 func (k *Writer) WriteBitsIntLe(n int, val uint64) error {
-	if n < 64 {
-		val &= (1 << uint(n)) - 1
-	}
-	// If bitsLeft + n > 64, `val << bitsLeft` would lose the high bits of val.
-	// Combine the buffered bits with enough low bits of val to flush one byte,
-	// which makes room for the rest. bitsLeft is always in 0..7 here.
-	if k.bitsLeft > 0 && k.bitsLeft+n > 64 {
-		take := 8 - k.bitsLeft
-		b := byte(k.bits | (val&((1<<uint(take))-1))<<uint(k.bitsLeft))
-		err := k.WriteU1(b)
-		if err != nil {
-			return fmt.Errorf("WriteBitsIntLe: failed to write full byte: %w", err)
+	k.bitsLe = true
+
+	bitsToWrite := k.bitsLeft + n
+
+	bytesToWrite := bitsToWrite / 8
+	oldBitsLeft := k.bitsLeft
+	k.bitsLeft = bitsToWrite % 8
+
+	if bytesToWrite > 0 {
+		buf := make([]byte, bytesToWrite)
+
+		newBits := val >> uint(n-k.bitsLeft)
+		val = val<<uint(oldBitsLeft) | k.bits
+		k.bits = newBits
+
+		for i := range bytesToWrite {
+			buf[i] = byte(val & 0xFF)
+			val >>= 8
 		}
-		val >>= uint(take)
-		n -= take
-		k.bits = 0
-		k.bitsLeft = 0
-	}
-	k.bits |= val << uint(k.bitsLeft)
-	k.bitsLeft += n
-	for k.bitsLeft >= 8 {
-		b := byte(k.bits & 0xff)
-		err := k.WriteU1(b)
+		_, err := k.Write(buf)
 		if err != nil {
-			return fmt.Errorf("WriteBitsIntLe: failed to write full byte: %w", err)
+			return fmt.Errorf("WriteBitsIntLe: %w", err)
 		}
-		k.bits >>= 8
-		k.bitsLeft -= 8
+	} else {
+		k.bits |= val << uint(oldBitsLeft)
 	}
+
+	var mask uint64 = (1 << uint(k.bitsLeft)) - 1 // `bitsLeft` is in range 0..7
+	k.bits &= mask
+
 	return nil
 }
 
 // AlignToByte flushes any remaining bits, padding with zeros.
 func (k *Writer) AlignToByte() error {
 	if k.bitsLeft > 0 {
-		b := byte(k.bits << uint(8-k.bitsLeft))
-		err := k.WriteU1(b)
-		if err != nil {
-			return err
+		b := k.bits
+		if !k.bitsLe {
+			b <<= uint(8 - k.bitsLeft)
 		}
-		k.bits = 0
 		k.bitsLeft = 0
-	}
-	return nil
-}
-
-// AlignToByteLe flushes any remaining bits in little-endian order.
-func (k *Writer) AlignToByteLe() error {
-	if k.bitsLeft > 0 {
-		b := byte(k.bits & 0xff)
-		err := k.WriteU1(b)
+		k.bits = 0
+		k.buf[0] = byte(b)
+		_, err := k.Write(k.buf[:1])
 		if err != nil {
-			return err
+			return fmt.Errorf("AlignToByte: %w", err)
 		}
-		k.bits = 0
-		k.bitsLeft = 0
 	}
 	return nil
 }
