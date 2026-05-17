@@ -660,7 +660,7 @@ func TestWriter_WriteBitsIntLe(t *testing.T) {
 		if err != nil {
 			t.Fatalf("err = %v", err)
 		}
-		err = w.AlignToByteLe()
+		err = w.AlignToByte()
 		if err != nil {
 			t.Fatalf("align err = %v", err)
 		}
@@ -676,7 +676,7 @@ func TestWriter_WriteBitsIntLe(t *testing.T) {
 		if err != nil {
 			t.Fatalf("err = %v", err)
 		}
-		err = w.AlignToByteLe()
+		err = w.AlignToByte()
 		if err != nil {
 			t.Fatalf("align err = %v", err)
 		}
@@ -701,7 +701,7 @@ func TestWriter_WriteBitsIntLe(t *testing.T) {
 		if err != nil {
 			t.Fatalf("err = %v", err)
 		}
-		err = w.AlignToByteLe()
+		err = w.AlignToByte()
 		if err != nil {
 			t.Fatalf("align err = %v", err)
 		}
@@ -752,18 +752,7 @@ func TestWriter_AlignToByte(t *testing.T) {
 	})
 }
 
-func TestWriter_AlignToByteLe(t *testing.T) {
-	t.Run("no bits buffered", func(t *testing.T) {
-		buf := &bytes.Buffer{}
-		w := NewWriter(buf)
-		err := w.AlignToByteLe()
-		if err != nil {
-			t.Fatalf("err = %v", err)
-		}
-		if buf.Len() != 0 {
-			t.Errorf("AlignToByteLe with no bits wrote %d bytes, want 0", buf.Len())
-		}
-	})
+func TestWriter_AlignToByte_LittleEndian(t *testing.T) {
 	t.Run("partial byte preserved in low bits", func(t *testing.T) {
 		buf := &bytes.Buffer{}
 		w := NewWriter(buf)
@@ -771,7 +760,7 @@ func TestWriter_AlignToByteLe(t *testing.T) {
 		if err != nil {
 			t.Fatalf("err = %v", err)
 		}
-		err = w.AlignToByteLe()
+		err = w.AlignToByte()
 		if err != nil {
 			t.Fatalf("err = %v", err)
 		}
